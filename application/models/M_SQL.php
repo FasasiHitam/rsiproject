@@ -3,6 +3,11 @@
 class M_SQL extends CI_Model
 {
     /* data result*/
+    public function data_pasien()
+    {
+        $q = $this->db->query("select * from public.tb_pasien");
+        return $q;
+    }
 
     /* DML */
     public function insert_data($data, $table)
