@@ -16,27 +16,61 @@
                     </div>
                     <div class="card-body">
                         <div class="text-center mb-4">
-                            <h4>Your Queue Number</h4>
-                            <div class="display-1 fw-bold text-success mb-3">
-                                <?php echo $result['queue_number']; ?>
-                            </div>
-                            <p class="lead">Please keep this number and wait for your turn.</p>
-                        </div>
+                            <h4>Patient Information</h4>
+                            <div class="mb-3">
+                                <?php
+                                // Debug: Print all available data
+                                var_dump($patient_data);
 
-                        <div class="alert alert-info">
-                            <strong>Patient ID:</strong> <?php echo $result['patient_number']; ?><br>
-                            <small>Please save this number for future visits</small>
+                                // Debug: Check file path
+                                if (isset($patient_data['barcode'])) {
+                                    $full_path = FCPATH . $patient_data['barcode'];
+                                    echo "Checking file: " . $full_path . "<br>";
+                                    echo "File exists: " . (file_exists($full_path) ? 'Yes' : 'No') . "<br>";
+                                }
+                                ?>
+
+                                <?php if (isset($patient_data) && isset($patient_data['barcode']) && file_exists(FCPATH . $patient_data['barcode'])): ?>
+                                    <img src="<?php echo base_url($patient_data['barcode']); ?>"
+                                        alt="Patient QR Code"
+                                        class="img-fluid"
+                                        style="max-width: 200px;">
+                                <?php else: ?>
+                                    <div class="alert alert-warning">
+                                        QR Code not available
+                                        <?php
+                                        // Debug: Show why it's not available
+                                        if (!isset($patient_data)) echo "- patient_data not set<br>";
+                                        if (!isset($patient_data['barcode'])) echo "- barcode not set<br>";
+                                        if (isset($patient_data['barcode']) && !file_exists(FCPATH . $patient_data['barcode']))
+                                            echo "- file does not exist: " . FCPATH . $patient_data['barcode'];
+                                        ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+
+                            <div class="alert alert-info">
+                                <h5>Your Queue Number</h5>
+                                <h2 class="mb-0"><?php echo $patient_data['queue_number']; ?></h2>
+                            </div>
+
+                            <div class="patient-details">
+                                <p><strong>No. Pasien:</strong> <?php echo $patient_data['patient_number']; ?></p>
+                                <p><strong>NIK:</strong> <?php echo $patient_data['nik']; ?></p>
+                                <p><strong>Nama:</strong> <?php echo $patient_data['nama_pasien']; ?></p>
+                                <p><strong>TTL:</strong> <?php echo $patient_data['ttl']; ?></p>
+                                <p><strong>No. Telepon:</strong> <?php echo $patient_data['no_telepon']; ?></p>
+                            </div>
                         </div>
 
                         <div class="d-grid gap-2">
-                            <a href="<?php echo site_url('queue/display_board'); ?>"
-                                class="btn btn-primary" target="_blank">
-                                View Queue Status
-                            </a>
-                            <a href="<?php echo site_url('patient/register'); ?>"
+                            <a href="<?php echo site_url('pasien/register'); ?>"
                                 class="btn btn-secondary">
                                 Register Another Patient
                             </a>
+                            <button onclick="window.print()" class="btn btn-primary">
+                                Print Information
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -44,25 +78,7 @@
         </div>
     </div>
 
-    <!-- Print Queue Ticket -->
-    <div class="d-none">
-        <div id="ticket-print">
-            <div style="width: 300px; padding: 20px; text-align: center;">
-                <h3>Queue Ticket</h3>
-                <h1 style="font-size: 48px;"><?php echo $result['queue_number']; ?></h1>
-                <p>Patient ID: <?php echo $result['patient_number']; ?></p>
-                <p>Date: <?php echo date('d/m/Y H:i'); ?></p>
-            </div>
-        </div>
-    </div>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            // Automatically print the ticket
-            window.print();
-        });
-    </script>
 </body>
 
 </html>
